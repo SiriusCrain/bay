@@ -379,15 +379,21 @@ impl WebviewManager {
             .send_event(Event::PlatformBoundEvent(PlatformBoundEvent::InitializePostRun))
             .expect("Failed to send post init event");
 
-        self.event_loop.run(move |event, window_target, control_flow| {
-            *control_flow = ControlFlow::Wait;
-            trace!(?event, "Main loop event");
-
-            if let Ok(menu_event) = MenuEvent::receiver().try_recv() {
+        // Dispatch tray menu events from the tray-icon thread directly. Polling the receiver
+        // inside the tao event loop only works when something else wakes the loop — a tray
+        // click with no focused app window does not, so the event would sit unread.
+        {
+            let proxy = proxy.clone();
+            MenuEvent::set_event_handler(Some(move |menu_event: MenuEvent| {
                 info!(?menu_event, "Menu Event");
                 menu::handle_event(&menu_event, &proxy);
                 tray::handle_event(&menu_event, &proxy);
-            }
+            }));
+        }
+
+        self.event_loop.run(move |event, window_target, control_flow| {
+            *control_flow = ControlFlow::Wait;
+            trace!(?event, "Main loop event");
 
             match event {
                 WryEvent::NewEvents(StartCause::Init) => info!("Fig has started"),
