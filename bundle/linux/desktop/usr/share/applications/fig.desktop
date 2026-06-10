@@ -1,11 +1,12 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Fig
+Name=Bay Desktop
 Comment=Autocomplete for the Terminal
-TryExec=fig_desktop
-Exec=fig_desktop %u
-Icon=fig
+TryExec=bay-desktop
+Exec=bay-desktop %u
+Icon=bay-desktop
 Terminal=false
 Categories=Development;
-MimeType=x-scheme-handler/fig
+StartupWMClass=bay-desktop
+MimeType=x-scheme-handler/bay

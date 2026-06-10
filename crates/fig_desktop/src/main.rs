@@ -101,6 +101,9 @@ async fn main() -> ExitCode {
     #[cfg(target_os = "macos")]
     install::migrate_data_dir().await;
 
+    #[cfg(target_os = "linux")]
+    gtk::glib::set_prgname(Some("bay-desktop"));
+
     if let Err(err) = fig_settings::settings::init_global() {
         error!(%err, "failed to init global settings");
     }

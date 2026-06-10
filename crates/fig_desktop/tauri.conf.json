@@ -26,6 +26,9 @@
       ],
       "resources": [],
       "category": "DeveloperTool",
+      "deb": {
+        "desktopTemplate": "../../bundle/linux/desktop/usr/share/applications/fig.desktop"
+      },
       "macOS": {
         "entitlements": "entitlements.plist"
       }
