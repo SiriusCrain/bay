@@ -339,17 +339,31 @@ where
         let fs = self.ctx.fs();
         let to_autostart_path = local_autostart_path(self.ctx)?;
         create_parent(fs, &to_autostart_path).await?;
-        if fs.symlink_exists(&to_autostart_path).await {
+        if fs.symlink_exists(&to_autostart_path).await || fs.exists(&to_autostart_path) {
             fs.remove_file(&to_autostart_path).await?;
         }
-        fs.symlink(&self.target, &to_autostart_path).await?;
+        if self.ctx.env().in_appimage() {
+            let exec = self
+                .ctx
+                .env()
+                .get("APPIMAGE")
+                .map_err(|err| Error::Custom(format!("APPIMAGE env var not set: {err}").into()))?;
+            let mut entry = EntryContents::new(
+                include_str!("../../../bundle/linux/desktop/usr/share/applications/fig.desktop").to_owned(),
+            );
+            entry.set_field("Exec", &format!("{} --is-startup --no-dashboard", exec));
+            entry.set_field("TryExec", &exec);
+            fs.write(&to_autostart_path, entry.to_string()).await?;
+        } else {
+            fs.symlink(&self.target, &to_autostart_path).await?;
+        }
         Ok(())
     }
 
     async fn uninstall(&self) -> Result<()> {
         let fs = self.ctx.fs();
         let to_autostart_path = local_autostart_path(self.ctx)?;
-        if fs.symlink_exists(&to_autostart_path).await {
+        if fs.symlink_exists(&to_autostart_path).await || fs.exists(&to_autostart_path) {
             fs.remove_file(&to_autostart_path).await?;
         }
         Ok(())
@@ -360,6 +374,21 @@ where
         let to_autostart_path = local_autostart_path(self.ctx)?;
         if !fs.exists(&to_autostart_path) {
             return Err(Error::FileDoesNotExist(to_autostart_path.clone().into()));
+        }
+        if self.ctx.env().in_appimage() {
+            let exec = self
+                .ctx
+                .env()
+                .get("APPIMAGE")
+                .map_err(|err| Error::Custom(format!("APPIMAGE env var not set: {err}").into()))?;
+            let entry = EntryContents::from_path(fs, &to_autostart_path).await?;
+            return match entry.get_field("Exec") {
+                Some(found) if found == exec => Ok(()),
+                Some(found) => Err(Error::ImproperInstallation(
+                    format!("Unexpected Exec: {}, expected {}", found, exec).into(),
+                )),
+                None => Err(Error::ImproperInstallation("Exec field is missing".into())),
+            };
         }
         let read_path = fs.read_link(&to_autostart_path).await?;
         if read_path != self.target {
@@ -374,10 +403,7 @@ where
 
 /// Whether or not the [`AutostartIntegration`] should be installed according to the user's
 /// environment and settings.
-pub fn should_install_autostart_entry<Ctx: EnvProvider>(env: &Ctx, settings: &Settings, state: &State) -> bool {
-    if env.env().in_appimage() && !state.get_bool_or("appimage.manageDesktopEntry", false) {
-        return false;
-    }
+pub fn should_install_autostart_entry<Ctx: EnvProvider>(_env: &Ctx, settings: &Settings, _state: &State) -> bool {
     settings.get_bool_or("app.launchOnStartup", true)
 }
 
@@ -561,22 +587,15 @@ Type=Application"#;
                 vec![("APPIMAGE", "/app.appimage")],
                 vec![],
                 vec![],
-                false,
-                "AppImage should not install without user permission",
-            ),
-            (
-                vec![("APPIMAGE", "/app.appimage")],
-                vec![],
-                vec![("appimage.manageDesktopEntry", true.into())],
                 true,
-                "AppImage should install by default if user has granted permission",
+                "AppImage should install by default",
             ),
             (
                 vec![("APPIMAGE", "/app.appimage")],
-                vec![("app.launchOnStartup", true.into())],
-                vec![("appimage.manageDesktopEntry", false.into())],
+                vec![("app.launchOnStartup", false.into())],
+                vec![],
                 false,
-                "AppImage should not install if user has removed permission",
+                "AppImage should not install if launchOnStartup is false",
             ),
         ];
         for test in testcases {

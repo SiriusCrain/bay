@@ -75,7 +75,7 @@ pub mod macos {
 }
 
 pub mod linux {
-    pub const DESKTOP_ENTRY_NAME: &str = "bay.desktop";
+    pub const DESKTOP_ENTRY_NAME: &str = "bay-desktop.desktop";
 
     /// Name of the deb package.
     pub const PACKAGE_NAME: &str = "bay";

@@ -262,14 +262,14 @@ pub async fn initialize_fig_dir(env: &fig_os_shim::Env) -> anyhow::Result<()> {
             }
 
             for shell in Shell::all() {
-                let pty_shell_cpy = local_bin.join(format!("{shell} ({PTY_BINARY_NAME})"));
+                let pty_shell_copy = local_bin.join(format!("{shell} ({PTY_BINARY_NAME})"));
                 let pty_path = pty_path.clone();
 
                 tokio::spawn(async move {
                     // Check version if copy already exists, this is because everytime a copy is made the first start is
                     // kinda slow and we want to avoid that
-                    if pty_shell_cpy.exists() {
-                        let output = tokio::process::Command::new(&pty_shell_cpy)
+                    if pty_shell_copy.exists() {
+                        let output = tokio::process::Command::new(&pty_shell_copy)
                             .arg("--version")
                             .output()
                             .await
@@ -291,11 +291,11 @@ pub async fn initialize_fig_dir(env: &fig_os_shim::Env) -> anyhow::Result<()> {
                         }
                     }
 
-                    if let Err(err) = tokio::fs::remove_file(&pty_shell_cpy).await {
+                    if let Err(err) = tokio::fs::remove_file(&pty_shell_copy).await {
                         error!(%err, "Failed to remove {PTY_BINARY_NAME} shell {shell:?} copy");
                     }
-                    if let Err(err) = tokio::fs::copy(&pty_path, &pty_shell_cpy).await {
-                        error!(%err, "Failed to copy {PTY_BINARY_NAME} to {}", pty_shell_cpy.display());
+                    if let Err(err) = tokio::fs::copy(&pty_path, &pty_shell_copy).await {
+                        error!(%err, "Failed to copy {PTY_BINARY_NAME} to {}", pty_shell_copy.display());
                     }
                 });
 
@@ -1164,30 +1164,17 @@ echo "{binary_name} {version}"
                 .with_env_var("APPIMAGE", "/test.appimage")
                 .build_fake();
             let fs = ctx.fs();
-            fs.create_dir_all(local_entry_path(&ctx).unwrap().parent().unwrap())
-                .await
-                .unwrap();
-            fs.write(local_entry_path(&ctx).unwrap(), "[Desktop Entry]")
-                .await
-                .unwrap();
+            let source = appimage_desktop_entry_path(&ctx).unwrap();
+            fs.create_dir_all(source.parent().unwrap()).await.unwrap();
+            fs.write(&source, "[Desktop Entry]\nExec=bay").await.unwrap();
 
             // When
-            install_autostart_entry(
-                &ctx,
-                &Settings::new_fake(),
-                &State::from_slice(&[("appimage.manageDesktopEntry", true.into())]),
-            )
-            .await
-            .unwrap();
+            install_autostart_entry(&ctx, &Settings::new_fake(), &State::new_fake())
+                .await
+                .unwrap();
 
             // Then
-            assert!(
-                AutostartIntegration::to_local(&ctx)
-                    .unwrap()
-                    .is_installed()
-                    .await
-                    .is_ok()
-            );
+            assert!(AutostartIntegration::new(&ctx).unwrap().is_installed().await.is_ok());
         }
     }
 }
