@@ -1,3 +1,4 @@
+pub mod caret;
 pub mod ibus;
 pub mod icons;
 pub mod integrations;
@@ -130,6 +131,12 @@ pub struct PlatformStateImpl {
     /// carries different text (user typed in the newly focused terminal).
     #[serde(skip)]
     pub(super) focus_change_suppress: Mutex<Option<(i32, Option<String>)>>,
+
+    /// State owned by the per-terminal caret strategies in
+    /// [`crate::platform::linux::caret`]. All caret-positioning state lives in
+    /// there, not scattered across `PlatformStateImpl`.
+    #[serde(skip)]
+    pub(super) caret_state: caret::CaretState,
 }
 
 impl PlatformStateImpl {
@@ -142,7 +149,18 @@ impl PlatformStateImpl {
             ibus_connected: AtomicBool::new(false),
             last_cursor_coords: Mutex::new(None),
             focus_change_suppress: Mutex::new(None),
+            caret_state: caret::CaretState::new(),
         }
+    }
+
+    /// Per-terminal caret strategy state — owned by [`caret`].
+    pub fn caret_state(&self) -> &caret::CaretState {
+        &self.caret_state
+    }
+
+    /// Snapshot of the focused terminal.
+    pub fn active_terminal_kind(&self) -> Option<Terminal> {
+        self.active_terminal.lock().clone()
     }
 
     pub(super) fn handle(

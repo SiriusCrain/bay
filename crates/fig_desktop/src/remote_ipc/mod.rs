@@ -144,44 +144,29 @@ impl fig_remote_ipc::RemoteHookHandler for RemoteHook {
             self.platform_state.check_focus_change_suppress(fig_pid, &hook.text)
         };
 
-        // Compute pixel caret position on Linux from terminal_cursor_coordinates + active
-        // terminal window inner bounds, and emit a RelativeToCaret update. This is the
-        // fallback path for terminals that don't emit IBus SetCursorLocation.
+        // Compute caret position on Linux. The per-terminal math and state
+        // live in `platform::linux::caret`; this site just packages the inputs
+        // and dispatches.
         #[cfg(target_os = "linux")]
-        if let (true, Some(coords), Some((inner_x, inner_y, inner_w, inner_h))) = (
+        if let (true, Some(coords), Some(inner)) = (
             session_is_focused && !focus_change_suppressed,
             hook.terminal_cursor_coordinates.as_ref(),
             self.platform_state.get_active_window_inner_origin(),
         ) {
-            // Prefer deriving cell size from inner window pixel dims / grid dims,
-            // since most Linux terminals (ghostty, gnome-terminal) leave TIOCGWINSZ
-            // ws_xpixel/ws_ypixel as 0. Fall back to the xpixel/ypixel figterm sent.
-            let cell_w = if coords.cols > 0 {
-                inner_w as f64 / coords.cols as f64
-            } else {
-                coords.xpixel as f64
-            };
-            let cell_h = if coords.rows > 0 {
-                inner_h as f64 / coords.rows as f64
-            } else {
-                coords.ypixel as f64
-            };
-            if cell_w > 0.0 && cell_h > 0.0 {
-                use tao::dpi::{
-                    LogicalPosition,
-                    LogicalSize,
-                };
-                let caret_x = inner_x as f64 + (coords.x as f64) * cell_w;
-                let caret_y = inner_y as f64 + (coords.y as f64) * cell_h;
+            let inner_state = self.platform_state.linux_inner();
+            let terminal = inner_state.active_terminal_kind();
+            if let Some(position) = crate::platform::caret::on_figterm_edit_buffer(
+                inner_state.caret_state(),
+                terminal.as_ref(),
+                coords,
+                inner,
+                hook.context.as_ref().and_then(|c| c.terminal_pid),
+            ) {
                 self.proxy
                     .send_event(Event::WindowEvent {
                         window_id: AUTOCOMPLETE_ID,
                         window_event: WindowEvent::UpdateWindowGeometry {
-                            position: Some(crate::event::WindowPosition::RelativeToCaret {
-                                caret_position: LogicalPosition::new(caret_x, caret_y).into(),
-                                caret_size: LogicalSize::new(cell_w, cell_h).into(),
-                                origin: fig_proto::local::caret_position_hook::Origin::TopLeft,
-                            }),
+                            position: Some(position),
                             size: None,
                             anchor: None,
                             tx: None,

@@ -5,17 +5,7 @@ use std::sync::atomic::Ordering;
 use anyhow::Result;
 use fig_dbus::connect_to_ibus_daemon;
 use fig_os_shim::Context;
-use fig_proto::local::caret_position_hook::Origin;
-use fig_util::terminal::PositioningKind;
 use futures::TryStreamExt;
-use tao::dpi::{
-    LogicalPosition,
-    LogicalSize,
-    PhysicalPosition,
-    PhysicalSize,
-    Position,
-    Size,
-};
 use tracing::{
     debug,
     error,
@@ -30,7 +20,6 @@ use super::PlatformStateImpl;
 use crate::event::{
     Event,
     WindowEvent,
-    WindowPosition,
 };
 use crate::platform::ActiveWindowData;
 use crate::{
@@ -103,39 +92,25 @@ pub async fn launch_ibus_connection(proxy: EventLoopProxy, platform_state: Arc<P
                                     debug!("null SetCursorLocation on {}", path.as_str());
                                 } else {
                                     debug!("SetCursorLocation{{x: {}, y: {}}} on {}", body.0, body.1, path.as_str());
-                                    let positioning_kind = platform_state
-                                        .active_terminal
-                                        .lock()
-                                        .as_ref()
-                                        .map_or(PositioningKind::Physical, |x| x.positioning_kind());
-
-                                    let (caret_position, caret_size): (Position, Size) = match positioning_kind {
-                                        PositioningKind::Logical => (
-                                            LogicalPosition::new(body.0 as f64, body.1 as f64).into(),
-                                            LogicalSize::new(body.2 as f64, body.3 as f64).into(),
-                                        ),
-                                        PositioningKind::Physical => (
-                                            PhysicalPosition::new(body.0, body.1).into(),
-                                            PhysicalSize::new(body.2, body.3).into(),
-                                        ),
-                                    };
-
-                                    proxy
-                                        .send_event(Event::WindowEvent {
-                                            window_id: AUTOCOMPLETE_ID.clone(),
-                                            window_event: WindowEvent::UpdateWindowGeometry {
-                                                position: Some(WindowPosition::RelativeToCaret {
-                                                    caret_position,
-                                                    caret_size,
-                                                    origin: Origin::TopLeft,
-                                                }),
-                                                size: None,
-                                                anchor: None,
-                                                tx: None,
-                                                dry_run: false,
-                                            },
-                                        })
-                                        .unwrap();
+                                    let active_pid = platform_state.active_window_data.lock().and_then(|w| w.pid);
+                                    if let Some(position) = super::caret::on_ibus_set_cursor_location(
+                                        &platform_state.caret_state,
+                                        active_pid,
+                                        body,
+                                    ) {
+                                        proxy
+                                            .send_event(Event::WindowEvent {
+                                                window_id: AUTOCOMPLETE_ID.clone(),
+                                                window_event: WindowEvent::UpdateWindowGeometry {
+                                                    position: Some(position),
+                                                    size: None,
+                                                    anchor: None,
+                                                    tx: None,
+                                                    dry_run: false,
+                                                },
+                                            })
+                                            .unwrap();
+                                    }
                                 }
                             },
                             "SetCursorLocationRelative" => {
@@ -157,40 +132,25 @@ pub async fn launch_ibus_connection(proxy: EventLoopProxy, platform_state: Arc<P
                                     body.3,
                                     path.as_str()
                                 );
-                                let abs: (i32, i32) = {
-                                    let handle = platform_state.active_window_data.lock();
-                                    match *handle {
-                                        Some(ActiveWindowData {
-                                            outer_x,
-                                            outer_y,
-                                            scale,
-                                            ..
-                                        }) => (
-                                            (body.0 as f32 / scale).round() as i32 + outer_x,
-                                            (body.1 as f32 / scale).round() as i32 + outer_y
-                                                - (body.3 as f32 / scale).round() as i32,
-                                        ),
-                                        None => continue,
-                                    }
+                                let (outer_x, outer_y, scale) = match *platform_state.active_window_data.lock() {
+                                    Some(ActiveWindowData {
+                                        outer_x,
+                                        outer_y,
+                                        scale,
+                                        ..
+                                    }) => (outer_x, outer_y, scale),
+                                    None => continue,
                                 };
-                                debug!("resolved cursor to {{x: {}, y: {}}}", abs.0, abs.1,);
+                                let Some(position) =
+                                    super::caret::on_ibus_set_cursor_location_relative(body, outer_x, outer_y, scale)
+                                else {
+                                    continue;
+                                };
                                 proxy
                                     .send_event(Event::WindowEvent {
                                         window_id: AUTOCOMPLETE_ID.clone(),
                                         window_event: WindowEvent::UpdateWindowGeometry {
-                                            position: Some(WindowPosition::RelativeToCaret {
-                                                caret_position: LogicalPosition {
-                                                    x: abs.0 as f64,
-                                                    y: abs.1 as f64,
-                                                }
-                                                .into(),
-                                                caret_size: LogicalSize {
-                                                    width: body.2 as f64,
-                                                    height: body.3 as f64,
-                                                }
-                                                .into(),
-                                                origin: Origin::TopLeft,
-                                            }),
+                                            position: Some(position),
                                             size: None,
                                             anchor: None,
                                             tx: None,

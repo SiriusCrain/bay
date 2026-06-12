@@ -111,6 +111,14 @@ impl PlatformState {
         self.0.check_focus_change_suppress(pid, text)
     }
 
+    /// Direct access to the Linux-specific platform state. Used by the caret
+    /// dispatcher in `platform::caret`, which needs to read several fields
+    /// atomically and record the latest IBus y for the active pid.
+    #[cfg(target_os = "linux")]
+    pub fn linux_inner(&self) -> &PlatformStateImpl {
+        &self.0
+    }
+
     /// Record the latest cursor coordinates from figterm (Linux only).
     /// Intended caller: GSE focus hook (not yet wired).
     #[cfg(target_os = "linux")]
