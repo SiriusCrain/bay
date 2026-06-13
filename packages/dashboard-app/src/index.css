@@ -5,37 +5,37 @@
 @font-face {
   font-family: "Ember";
   font-weight: 100;
-  src: url("../assets/fonts/Ember/AmazonEmber_Th.ttf");
+  src: url("../assets/fonts/Ember/AmazonEmber_Th.woff2");
 }
 
 @font-face {
   font-family: "Ember";
   font-weight: 200 300;
-  src: url("../assets/fonts/Ember/AmazonEmber_Lt.ttf");
+  src: url("../assets/fonts/Ember/AmazonEmber_Lt.woff2");
 }
 
 @font-face {
   font-family: "Ember";
   font-weight: 400;
-  src: url("../assets/fonts/Ember/AmazonEmber_Rg.ttf");
+  src: url("../assets/fonts/Ember/AmazonEmber_Rg.woff2");
 }
 
 @font-face {
   font-family: "Ember";
   font-weight: 500 600;
-  src: url("../assets/fonts/Ember/AmazonEmber_Md.ttf");
+  src: url("../assets/fonts/Ember/AmazonEmber_Md.woff2");
 }
 
 @font-face {
   font-family: "Ember";
   font-weight: 700;
-  src: url("../assets/fonts/Ember/AmazonEmber_Bd.ttf");
+  src: url("../assets/fonts/Ember/AmazonEmber_Bd.woff2");
 }
 
 @font-face {
   font-family: "Ember";
   font-weight: 800 900;
-  src: url("../assets/fonts/Ember/AmazonEmber_He.ttf");
+  src: url("../assets/fonts/Ember/AmazonEmber_He.woff2");
 }
 
 @layer base {
