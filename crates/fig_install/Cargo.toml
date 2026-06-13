@@ -15,10 +15,8 @@ default = []
 
 [dependencies]
 bitflags.workspace = true
-bytes.workspace = true
 camino.workspace = true
 cfg-if.workspace = true
-cookie = "0.18.0"
 fig_integrations.workspace = true
 fig_os_shim.workspace = true
 fig_request.workspace = true
@@ -34,7 +32,6 @@ serde_json.workspace = true
 strum = "0.28.0"
 tempfile.workspace = true
 thiserror.workspace = true
-time.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 url.workspace = true

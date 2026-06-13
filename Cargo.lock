@@ -63,7 +63,6 @@ name = "alacritty_terminal"
 version = "0.1.0"
 dependencies = [
  "bitflags 2.11.1",
- "camino",
  "fig_os_shim",
  "serde",
  "serde_json",
@@ -1090,15 +1089,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c"
 
 [[package]]
-name = "convert_case"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "baaaa0ecca5b51987b9423ccdc971514dd8b0bb7b4060b983d3664dad3f1f89f"
-dependencies = [
- "unicode-segmentation",
-]
-
-[[package]]
 name = "cookie"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1875,7 +1865,6 @@ dependencies = [
  "async-trait",
  "base64",
  "bytes",
- "camino",
  "cfg-if",
  "clap",
  "cocoa",
@@ -1902,7 +1891,6 @@ dependencies = [
  "http",
  "image",
  "infer",
- "keyboard-types 0.8.3",
  "libc",
  "macos-utils",
  "mime",
@@ -1916,7 +1904,6 @@ dependencies = [
  "parking_lot",
  "paste",
  "percent-encoding",
- "rand 0.9.4",
  "regex",
  "rfd",
  "semver",
@@ -1926,7 +1913,6 @@ dependencies = [
  "sysinfo",
  "tao",
  "tempfile",
- "time",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -1934,7 +1920,6 @@ dependencies = [
  "url",
  "uuid",
  "which",
- "whoami",
  "windows 0.58.0",
  "wry",
  "x11rb",
@@ -1947,7 +1932,6 @@ version = "0.0.0"
 dependencies = [
  "fig_ipc",
  "fig_proto",
- "fig_util",
  "libfuzzer-sys",
  "tempfile",
  "tokio",
@@ -1981,7 +1965,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "uuid",
  "which",
  "whoami",
 ]
@@ -1990,14 +1973,9 @@ dependencies = [
 name = "fig_diagnostic"
 version = "0.1.0"
 dependencies = [
- "cfg-if",
- "clap",
- "fig_ipc",
  "fig_os_shim",
- "fig_proto",
  "fig_util",
  "serde",
- "serde_json",
  "sysinfo",
  "time",
  "tokio",
@@ -2031,10 +2009,8 @@ name = "fig_install"
 version = "0.1.0"
 dependencies = [
  "bitflags 2.11.1",
- "bytes",
  "camino",
  "cfg-if",
- "cookie",
  "fig_dbus",
  "fig_integrations",
  "fig_ipc",
@@ -2056,7 +2032,6 @@ dependencies = [
  "tar",
  "tempfile",
  "thiserror 2.0.18",
- "time",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2109,14 +2084,12 @@ dependencies = [
  "flate2",
  "nix 0.29.0",
  "pin-project-lite",
- "rand 0.9.4",
  "tempfile",
  "thiserror 2.0.18",
  "tokio",
  "tokio-util",
  "tracing",
  "uuid",
- "whoami",
 ]
 
 [[package]]
@@ -2124,8 +2097,6 @@ name = "fig_log"
 version = "0.1.0"
 dependencies = [
  "fig_os_shim",
- "fig_util",
- "parking_lot",
  "tempfile",
  "thiserror 2.0.18",
  "tracing",
@@ -2181,7 +2152,6 @@ dependencies = [
  "flume",
  "parking_lot",
  "serde",
- "time",
  "tokio",
  "tracing",
  "uuid",
@@ -2220,10 +2190,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror 2.0.18",
- "tokio",
  "tracing",
- "url",
- "uuid",
 ]
 
 [[package]]
@@ -2231,15 +2198,11 @@ name = "fig_test_utils"
 version = "0.1.0"
 dependencies = [
  "bytes",
- "fig_os_shim",
- "fig_util",
- "hex",
  "http",
  "http-body-util",
  "hyper",
  "hyper-util",
  "reqwest",
- "ring",
  "tokio",
  "tokio-util",
 ]
@@ -2296,44 +2259,31 @@ dependencies = [
  "bytes",
  "cfg-if",
  "clap",
- "crossterm",
  "dashmap",
- "fig_install",
  "fig_ipc",
  "fig_log",
  "fig_os_shim",
  "fig_proto",
- "fig_request",
  "fig_settings",
  "fig_util",
  "filedescriptor",
  "flume",
  "fnv",
- "indoc",
  "lazy_static",
  "memmem",
  "mimalloc",
  "nix 0.29.0",
  "num-traits",
- "parking_lot",
  "pin-project",
  "portable-pty",
  "predicates",
- "regex",
- "semver",
- "serde",
- "serde_json",
  "shared_library",
  "shell-color",
- "shell-words",
- "shellexpand",
  "shlex",
  "sysinfo",
  "tempfile",
- "time",
  "tokio",
  "tracing",
- "tracing-subscriber",
  "uuid",
  "which",
  "winapi",
@@ -2347,7 +2297,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "fig_ipc",
  "fig_proto",
  "fig_remote_ipc",
  "fig_util",
@@ -3645,16 +3594,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "keyboard-types"
-version = "0.8.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fbe853b403ae61a04233030ae8a79d94975281ed9770a1f9e246732b534b28d"
-dependencies = [
- "bitflags 2.11.1",
- "serde",
-]
-
-[[package]]
 name = "kqueue"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4113,7 +4052,7 @@ dependencies = [
  "crossbeam-channel",
  "dpi",
  "gtk",
- "keyboard-types 0.7.0",
+ "keyboard-types",
  "objc2 0.6.4",
  "objc2-app-kit 0.3.2",
  "objc2-core-foundation",
@@ -5512,11 +5451,8 @@ name = "q_cli"
 version = "0.1.0"
 dependencies = [
  "anstream 0.6.21",
- "appkit-nsworkspace-bindings",
  "assert_cmd",
  "async-trait",
- "base64",
- "bitflags 2.11.1",
  "bytes",
  "cfg-if",
  "clap",
@@ -5524,7 +5460,6 @@ dependencies = [
  "clap_complete_fig",
  "color-eyre",
  "color-print",
- "convert_case",
  "criterion",
  "crossterm",
  "ctrlc",
@@ -5539,10 +5474,8 @@ dependencies = [
  "fig_os_shim",
  "fig_proto",
  "fig_remote_ipc",
- "fig_request",
  "fig_settings",
  "fig_util",
- "flume",
  "futures",
  "glob",
  "globset",
@@ -5556,7 +5489,6 @@ dependencies = [
  "objc2-app-kit 0.2.2",
  "objc2-foundation 0.2.2",
  "owo-colors",
- "parking_lot",
  "paste",
  "predicates",
  "rand 0.9.4",
@@ -5567,19 +5499,15 @@ dependencies = [
  "spinners",
  "sysinfo",
  "tempfile",
- "thiserror 2.0.18",
  "time",
  "tokio",
  "tokio-tungstenite",
  "tokio-util",
  "tracing",
- "tracing-subscriber",
- "unicode-width 0.2.2",
  "url",
  "uuid",
  "walkdir",
  "which",
- "whoami",
  "winapi",
  "windows 0.58.0",
 ]

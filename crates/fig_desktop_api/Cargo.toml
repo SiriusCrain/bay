@@ -31,7 +31,6 @@ shellexpand.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-uuid.workspace = true
 which.workspace = true
 whoami.workspace = true
 

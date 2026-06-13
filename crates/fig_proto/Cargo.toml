@@ -10,6 +10,9 @@ license.workspace = true
 [lints]
 workspace = true
 
+[package.metadata.cargo-machete]
+ignored = ["arbitrary"]
+
 [dependencies]
 arbitrary = { version = "1.4.1", optional = true, features = ["derive"] }
 bytes.workspace = true

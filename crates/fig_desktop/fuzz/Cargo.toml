@@ -10,7 +10,6 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.4"
 fig_ipc.workspace = true
-fig_util.workspace = true
 tempfile.workspace = true
 tokio.workspace = true
 fig_proto = { workspace = true, features = ["arbitrary"] }
