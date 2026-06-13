@@ -21,7 +21,6 @@
 - `build-scripts/` — Python build orchestration (`main.py`, `build.py`, `rust.py`, `const.py`, `util.py`, `signing.py`)
 - `build-config/` — buildspec YAML for CI
 - `bundle/` — Linux AppImage bundling assets
-- `cloned_spec/` — Local mirror of the withfig/autocomplete specs
 - `tests/` — Integration tests
 
 ## Rust workspace

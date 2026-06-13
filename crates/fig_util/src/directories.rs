@@ -128,16 +128,6 @@ pub fn config_dir() -> Result<PathBuf> {
     dirs::config_dir().ok_or(DirectoryError::NoHomeDirectory)
 }
 
-/// The old codewhisperer data directory
-///
-/// This should be removed at some point in the future, once all our users have migrated
-/// - MacOS: `$HOME/Library/Application Support/codewhisperer`
-pub fn old_fig_data_dir() -> Result<PathBuf> {
-    Ok(dirs::data_local_dir()
-        .ok_or(DirectoryError::NoHomeDirectory)?
-        .join("codewhisperer"))
-}
-
 /// The q data directory
 ///
 /// - Linux: `$XDG_DATA_HOME/{data_dir}` or `$HOME/.local/share/{data_dir}`

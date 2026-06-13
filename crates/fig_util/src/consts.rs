@@ -33,17 +33,7 @@ pub const DATA_DIR_NAME: &str = "Bay";
 /// Backup directory name
 pub const BACKUP_DIR_NAME: &str = ".bay.dotfiles.bak";
 
-// Previous branding — used by uninstall/migration code to find legacy installs.
-pub const OLD_PRODUCT_NAME: &str = "Amazon Q";
-pub const OLD_CLI_BINARY_NAMES: &[&str] = &["q", "cw"];
-pub const OLD_PTY_BINARY_NAMES: &[&str] = &["qterm", "cwterm"];
-/// Previous unix data directory name, used for one-shot migration on startup.
-#[cfg(unix)]
-pub const OLD_DATA_DIR_NAME: &str = "amazon-q";
-#[cfg(windows)]
-pub const OLD_DATA_DIR_NAME: &str = "AmazonQ";
-
-pub const GITHUB_REPO_NAME: &str = "SiriusCrain/fig-lite";
+pub const GITHUB_REPO_NAME: &str = "SiriusCrain/bay";
 
 /// Build time env vars
 pub mod build {

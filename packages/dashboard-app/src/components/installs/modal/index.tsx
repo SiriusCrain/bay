@@ -6,18 +6,13 @@ import Lockup from "../../svg/logo";
 import onboarding from "@/data/onboarding";
 import { useStatusCheck } from "@/hooks/store/useStatusCheck";
 import InstallModal from "./install";
-import { useLocalState, useRefreshLocalState } from "@/hooks/store/useState";
-import migrate_dark from "@assets/images/fig-migration/dark.png?url";
+import { useRefreshLocalState } from "@/hooks/store/useState";
 import { usePlatformInfo } from "@/hooks/store/usePlatformInfo";
 import { matchesPlatformRestrictions } from "@/lib/platform";
 
 export default function OnboardingModal() {
   const [step, setStep] = useState(0);
   const check = onboarding[step] as InstallCheck;
-  const [migrationStarted] = useLocalState("desktop.migratedFromFig");
-  const [migrationEnded, setMigrationEnded] = useLocalState(
-    "desktop.migratedFromFig.UiComplete",
-  );
   const [dotfilesCheck, refreshDotfiles] = useStatusCheck("dotfiles");
   const [accessibilityCheck, refreshAccessibility] =
     useStatusCheck("accessibility");
@@ -30,9 +25,6 @@ export default function OnboardingModal() {
 
   const [_dotfiles, setDotfiles] = useState(dotfilesCheck);
   const [_accessibility, setAccessibility] = useState(accessibilityCheck);
-
-  const isMigrating =
-    Boolean(migrationStarted) === true && Boolean(migrationEnded) === false;
 
   useEffect(() => {
     refreshAccessibility();
@@ -61,10 +53,6 @@ export default function OnboardingModal() {
   }
 
   function advance() {
-    if (migrationStarted && !migrationEnded) {
-      setMigrationEnded(true);
-    }
-
     if (step === onboarding.length - 1) {
       finish();
     } else {
@@ -88,10 +76,6 @@ export default function OnboardingModal() {
     setStep(step + 1);
   }
 
-  if (check.id === "welcome" && isMigrating) {
-    return <WelcomeModal figMigration next={advance} />;
-  }
-
   if (check.id === "welcome") {
     return <WelcomeModal next={advance} />;
   }
@@ -107,24 +91,14 @@ export default function OnboardingModal() {
   return null;
 }
 
-export function WelcomeModal({
-  next,
-  figMigration,
-}: {
-  next: () => void;
-  figMigration?: boolean;
-}) {
+export function WelcomeModal({ next }: { next: () => void }) {
   return (
     <div className="flex flex-col items-center gap-8 gradient-q-secondary-light -m-10 p-4 pt-10 rounded-lg text-white">
       <div className="flex flex-col items-center gap-8">
-        {figMigration ? (
-          <img src={migrate_dark} className="w-40" />
-        ) : (
-          <Lockup />
-        )}
+        <Lockup />
         <div className="flex flex-col gap-2 items-center text-center">
           <h2 className="text-2xl text-white font-semibold select-none leading-none font-ember tracking-tight">
-            {figMigration ? "Almost done upgrading!" : "Welcome!"}
+            Welcome!
           </h2>
           <p className="text-sm">Let's get you set up...</p>
         </div>

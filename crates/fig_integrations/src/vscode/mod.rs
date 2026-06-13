@@ -14,7 +14,6 @@ use crate::{
     Integration,
 };
 
-const OLD_EXTENSION_PREFIX: &str = "withfig.fig-";
 const EXTENSION_PREFIX: &str = "amazonwebservices.codewhisperer-for-command-line-companion";
 
 const EXTENSION_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -191,8 +190,6 @@ impl Integration for VSCodeIntegration {
         if self.is_installed().await.is_ok() {
             return Ok(());
         }
-
-        self.remove_ext_by_prefix(OLD_EXTENSION_PREFIX).await.ok();
 
         if let Err(err) = self.update_settings().await {
             error!("error updating {} settings: {err:?}", self.variant.application_name);

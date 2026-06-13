@@ -93,7 +93,6 @@ cargo clippy --locked --workspace --color always -- -D warnings
 - [`build-scripts/`](build-scripts/) — Python build/sign orchestration
 - [`proto/`](proto/) — protobuf IPC message definitions
 - [`tests/`](tests/) — integration tests
-- [`cloned_spec/`](cloned_spec/) — local mirror of the withfig/autocomplete specs
 
 See [`codebase-summary.md`](codebase-summary.md) for a summary of the Rust workspace crates.
 

@@ -98,9 +98,6 @@ async fn main() -> ExitCode {
     })
     .expect("Failed to init logging");
 
-    #[cfg(target_os = "macos")]
-    install::migrate_data_dir().await;
-
     #[cfg(target_os = "linux")]
     gtk::glib::set_prgname(Some("bay-desktop"));
 
