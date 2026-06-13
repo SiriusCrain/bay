@@ -48,9 +48,30 @@ export default defineConfig(({ command }) => ({
   build: {
     target: command === "build" ? "es2017" : "esnext",
     sourcemap: command !== "build",
-  },
-  esbuild: {
-    target: command === "build" ? ["es2017", "safari11"] : undefined,
+    rolldownOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return null;
+          if (
+            id.includes("/react-router-dom/") ||
+            id.includes("/react-router/")
+          ) {
+            return "vendor-router";
+          }
+          if (id.includes("/@radix-ui/") || id.includes("/lucide-react/")) {
+            return "vendor-ui";
+          }
+          if (
+            id.includes("/react-dom/") ||
+            id.includes("/react/") ||
+            id.includes("/scheduler/")
+          ) {
+            return "vendor-react";
+          }
+          return "vendor";
+        },
+      },
+    },
   },
   resolve: {
     alias: {

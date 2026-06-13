@@ -5,7 +5,6 @@ import {
   type HtmlTagDescriptor,
 } from "vite";
 import react from "@vitejs/plugin-react";
-// import legacy from "@vitejs/plugin-legacy";
 
 const csp: Record<string, string> = {
   "default-src": "'self'",
@@ -50,17 +49,7 @@ export default defineConfig(({ mode, command }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd(), "") };
 
   return {
-    plugins: [
-      react(),
-      htmlCspPlugin,
-      // legacy({
-      //   targets: [
-      //     "safari >= 11",
-      //     "last 3 Chrome version",
-      //     "last 3 Firefox version",
-      //   ],
-      // }),
-    ],
+    plugins: [react(), htmlCspPlugin],
     css: {
       modules: {
         localsConvention: "camelCaseOnly",
@@ -74,21 +63,37 @@ export default defineConfig(({ mode, command }) => {
       target: command === "build" ? "es2017" : "esnext",
       // TODO: re-enable prod source maps to upload them to sentry (see build CIs)
       sourcemap: command !== "build",
-      rollupOptions: {
+      rolldownOptions: {
         external: [
           "?type=option",
           "?type=carrot",
           "?type=command",
           "?type=box",
         ],
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return null;
+            if (id.includes("/@bufbuild/")) {
+              return "vendor-proto";
+            }
+            if (id.includes("/react-window/")) {
+              return "vendor-window";
+            }
+            if (
+              id.includes("/react-dom/") ||
+              id.includes("/react/") ||
+              id.includes("/scheduler/")
+            ) {
+              return "vendor-react";
+            }
+            return "vendor";
+          },
+        },
       },
     },
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
       "process.env": {},
-    },
-    esbuild: {
-      target: command === "build" ? ["es2017", "safari11"] : undefined,
     },
     resolve: {
       alias: {
