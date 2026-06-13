@@ -49,6 +49,7 @@ pub const LINUX_TERMINALS: &[Terminal] = &[
     Terminal::IntelliJ(None),
     Terminal::Positron,
     Terminal::Ghostty,
+    Terminal::Zed,
 ];
 
 /// Other terminals that figterm should launch within that are not full terminal emulators
@@ -508,7 +509,7 @@ impl Terminal {
             Terminal::Hyper => &["hyper"],
             Terminal::Tabby => &["tabby"],
             Terminal::Terminator => &["terminator"],
-            Terminal::Zed => &["zed"],
+            Terminal::Zed => &["zed", "zed-editor"],
             Terminal::Cursor => &["Cursor", "cursor"],
             Terminal::CursorNightly => &["Cursor Nightly", "cursor-nightly"],
             Terminal::Rio => &["rio"],
@@ -547,6 +548,7 @@ impl Terminal {
             Terminal::Terminology => Some("terminology"),
             Terminal::WezTerm => Some("org.wezfurlong.wezterm"),
             Terminal::Ghostty => Some("com.mitchellh.ghostty"),
+            Terminal::Zed => Some("dev.zed.Zed"),
             Terminal::Tabby => Some("tabby"),
             Terminal::IntelliJ(Some(IntelliJVariant::IdeaCE)) => Some("jetbrains-idea-ce"),
             _ => None,

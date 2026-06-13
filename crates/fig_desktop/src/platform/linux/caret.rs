@@ -161,10 +161,19 @@ pub fn on_figterm_edit_buffer(
         None => inner_x as f64 + (coords.x as f64) * cell_w,
     };
 
-    // Caret y: IBus override when available, else figterm-naive.
-    // `emitted_cell_h` is the popup placement offset — see [`emit_full_cell_height`].
+    // Caret y: IBus override when available, else figterm-naive. `emitted_cell_h` is the popup
+    // placement offset — see [`emit_full_cell_height`]. Zed reports y near the cell bottom (like
+    // Ghostty) but with extra descender padding, so a small fraction of cell_h lands the popup
+    // just below the glyph without a visible gap.
     let (caret_y, emitted_cell_h) = match pid.and_then(|pid| state.last_ibus_y.lock().get(&pid).copied()) {
-        Some(y) => (y as f64, if emit_full_cell_height(terminal) { cell_h } else { 1.0 }),
+        Some(y) => {
+            let height = match terminal {
+                Some(Terminal::Zed) => cell_h * 0.18,
+                _ if emit_full_cell_height(terminal) => cell_h,
+                _ => 1.0,
+            };
+            (y as f64, height)
+        },
         None => (inner_y as f64 + (coords.y as f64) * cell_h, cell_h),
     };
 
