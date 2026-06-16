@@ -7,7 +7,7 @@ IDE-style autocomplete for your terminal. Fork of the Amazon Q Developer CLI, sc
 - **Autocomplete** for hundreds of CLIs (`git`, `npm`, `docker`, `aws`, `kubectl`, ...) driven by the [withfig/autocomplete](https://github.com/withfig/autocomplete) spec set
 - **Desktop popup** anchored to your cursor in the terminal, built on `tao` + `wry`
 - **Shell integration** for bash, zsh, fish via a PTY shim (`figterm`)
-- **IDE integration** for VSCode, JetBrains, GNOME Terminal
+- **IDE integration** for VSCode, JetBrains, Zed
 
 ## Installation
 
