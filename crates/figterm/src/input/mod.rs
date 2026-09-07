@@ -1657,6 +1657,26 @@ impl InputParser {
                     }
                 },
                 InputState::EscapeMaybeAlt | InputState::Normal => {
+                    if self.state == InputState::Normal {
+                        let buf = self.buf.as_slice();
+                        let csi_len = buf.strip_prefix(CSI.as_bytes()).map(|params| {
+                            params
+                                .iter()
+                                .position(|b| (0x40..=0x7e).contains(b))
+                                .map(|idx| CSI.len() + idx + 1)
+                        });
+                        match csi_len {
+                            Some(Some(len)) if !matches!(self.key_map.lookup(&buf[..len]), Found::Exact(l, _) if l == len) =>
+                            {
+                                self.advance_buf(len);
+                                self.dispatch_callback(&mut callback, InputEvent::RawString);
+                                continue;
+                            },
+                            Some(None) if maybe_more => return,
+                            _ => {},
+                        }
+                    }
+
                     /* Ignore mouse events for now. This requires the full VT Parser from wezterm.
 
                     if self.state == InputState::Normal && self.buf.as_slice()[0] == b'\x1b' {
