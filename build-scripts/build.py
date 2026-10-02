@@ -707,8 +707,11 @@ def build_linux_full(
     ]
     if release:
         cargo_build_args.append("--release")
-    if features and features.get(DESKTOP_PACKAGE_NAME):
-        cargo_build_args.extend(["--features", ",".join(features[DESKTOP_PACKAGE_NAME])])
+    desktop_features = list(features.get(DESKTOP_PACKAGE_NAME, []) if features else [])
+    if build_appimage:
+        desktop_features.append("custom-protocol")
+    if desktop_features:
+        cargo_build_args.extend(["--features", ",".join(desktop_features)])
     run_cmd(
         cargo_build_args,
         env={**os.environ, **rust_env(release=release, variant=Variant.FULL)},
