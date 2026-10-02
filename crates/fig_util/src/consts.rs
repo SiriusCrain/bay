@@ -54,6 +54,10 @@ pub mod build {
 
     /// If `shellcheck` tests should be skipped
     pub const SKIP_SHELLCHECK_TESTS: bool = option_env!("BAY_BUILD_SKIP_SHELLCHECK_TESTS").is_some();
+
+    pub fn short_hash() -> Option<&'static str> {
+        HASH.map(|hash| &hash[..hash.len().min(7)])
+    }
 }
 
 /// macOS specific constants

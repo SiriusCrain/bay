@@ -54,11 +54,17 @@ where
         None
     };
 
+    let app_version = Some(match fig_util::consts::build::short_hash() {
+        Some(hash) => format!("{} - {hash}", env!("CARGO_PKG_VERSION")),
+        None => env!("CARGO_PKG_VERSION").to_owned(),
+    });
+
     let response = ServerOriginatedSubMessage::GetPlatformInfoResponse(GetPlatformInfoResponse {
         os: os.into(),
         desktop_environment,
         display_server_protocol,
         app_bundle_type,
+        app_version,
     });
     Ok(response.into())
 }

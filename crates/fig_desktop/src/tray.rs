@@ -499,7 +499,10 @@ impl MenuElement {
 
 fn menu() -> Vec<MenuElement> {
     let not_working = MenuElement::entry(None, None, format!("{PRODUCT_NAME} not working?"), "not-working");
-    let version = MenuElement::info(None, format!("Version: {}", env!("CARGO_PKG_VERSION")));
+    let version = MenuElement::info(None, match fig_util::consts::build::short_hash() {
+        Some(hash) => format!("Version: {} ({hash})", env!("CARGO_PKG_VERSION")),
+        None => format!("Version: {}", env!("CARGO_PKG_VERSION")),
+    });
     let update = MenuElement::entry(None, None, "Check for updates...", "update");
     let quit = MenuElement::entry(None, None, format!("Quit {PRODUCT_NAME}"), "quit");
     let settings = MenuElement::entry(None, None, "Settings", "settings");

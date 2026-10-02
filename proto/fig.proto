@@ -324,6 +324,7 @@ message GetPlatformInfoResponse {
   optional DesktopEnvironment desktop_environment = 2;
   optional DisplayServerProtocol display_server_protocol = 3;
   optional AppBundleType app_bundle_type = 4;
+  optional string app_version = 5;
 }
 
 /// Window Focus
