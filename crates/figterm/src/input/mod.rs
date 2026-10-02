@@ -1269,12 +1269,19 @@ impl InputParser {
         // `CSI u` encodings for the ascii range;
         // see http://www.leonerd.org.uk/hacks/fixterms/
         for c in 0..=0x7fu8 {
+            let key_code = match c {
+                9 => KeyCode::Tab,
+                13 => KeyCode::Enter,
+                27 => KeyCode::Escape,
+                127 => KeyCode::Backspace,
+                c => KeyCode::Char(c as char),
+            };
             for (suffix, modifiers) in modifier_combos_including_meta() {
                 let key = format!("\x1b[{c}{suffix}u");
                 map.insert(
                     key,
                     InputEvent::Key(KeyEvent {
-                        key: KeyCode::Char(c as char),
+                        key: key_code,
                         modifiers: *modifiers,
                     }),
                 );
